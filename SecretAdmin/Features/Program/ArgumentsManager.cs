@@ -7,6 +7,7 @@
          * --reconfigure -r
          * --config <filename> -c
          * --no-logs -nl
+         * --simple-output -so
          */
 
         public static Args GetArgs(string[] args)
@@ -21,10 +22,14 @@
                         ret.Reconfigure = true;
                         break;
                     case "--config" or "-c" when args.Length > i + 1:
-                        ret.Config = args[i + 1];
+                        i++;
+                        ret.Config = args[i];
                         break;
                     case "--no-logs" or "-nl":
                         ret.Logs = false;
+                        break;
+                    case "--simple-output" or "-so":
+                        ret.SimpleOutput = true;
                         break;
                 }
             }
@@ -37,6 +42,7 @@
             public bool Reconfigure = false;
             public string Config = "default.yml";
             public bool Logs = true;
+            public bool SimpleOutput = false;
         }
     }
 }

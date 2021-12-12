@@ -23,9 +23,18 @@ namespace SecretAdmin.Features.Console
  _`, :' '_.''  ..': ..'' '_.': :   : :: :' .; :: ,. ,. :: :: ,. :
 `.__.'`.__.'`.__.':_;  `.__.':_;   :_;:_;`.__.':_;:_;:_;:_;:_;:_;
                                                                  ");
-            Write($"[cyan]Secret Admin - Version v{SecretAdmin.Program.Version}[/]");
-            WriteLine(" [lightgoldenrod1]by Jesus-QC[/]");
-            WriteLine("[thistle1]Released under MIT License Copyright © Jesus-QC 2021[/]");
+            if (Args.SimpleOutput)
+            {
+                Write($"Secret Admin - Version v{SecretAdmin.Program.Version}", ConsoleColor.Cyan);
+                WriteLine(" by Jesus-QC", ConsoleColor.Yellow);
+                WriteLine("Released under MIT License Copyright © Jesus-QC 2021", ConsoleColor.Magenta);
+            }
+            else
+            {
+                Write($"[cyan]Secret Admin - Version v{SecretAdmin.Program.Version}[/]");
+                WriteLine(" [lightgoldenrod1]by Jesus-QC[/]");
+                WriteLine("[thistle1]Released under MIT License Copyright © Jesus-QC 2021[/]");
+            }
 
             if (ConfigManager.SecretAdminConfig.ManualStart)
                 ReadKey();
@@ -58,7 +67,17 @@ namespace SecretAdmin.Features.Console
         // Alerts
         
         public static void Raw(object message, ConsoleColor color = ConsoleColor.White, bool showTimeStamp = true) => WriteLine(showTimeStamp ? $"[[{DateTime.Now:T}]] {message.ToString().EscapeMarkup()}" : message, color);
-        public static void SpectreRaw(object message, string color = "white", bool showTimeStamp = false, string timestampColor = "white") => WriteLine(showTimeStamp ? $"[{timestampColor}][[{DateTime.Now:T}]][/] [{color}]{message}[/]" : $"[{color}]{message}[/]");
+
+        public static void SpectreRaw(object message, string color = "white", bool showTimeStamp = false, string timestampColor = "white")
+        {
+            if (Args.SimpleOutput)
+            {
+                Raw(message, ConsoleColor.DarkYellow, showTimeStamp);
+                return;
+            }
+
+            WriteLine(showTimeStamp ? $"[{timestampColor}][[{DateTime.Now:T}]][/] [{color}]{message}[/]" : $"[{color}]{message}[/]");
+        }
 
         private static void Info(string title, string message)
         {
@@ -119,6 +138,12 @@ namespace SecretAdmin.Features.Console
             
             if(!ev.IsAllowed|| string.IsNullOrWhiteSpace(message))
                 return;
+
+            if (Args.SimpleOutput)
+            {
+                Raw(message, (ConsoleColor)code);
+                return;
+            }
             
             var match = FrameworksRegex.Match(message);
 
