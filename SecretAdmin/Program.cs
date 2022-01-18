@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using SecretAdmin.API;
+using SecretAdmin.API.Events.Handlers;
 using Spectre.Console;
 using SecretAdmin.Features.Console;
 using SecretAdmin.Features.Program;
@@ -12,10 +13,11 @@ namespace SecretAdmin
 {
     class Program
     {
-        public static Version Version { get; } = new (0, 0, 0,3);
+        public static Version Version { get; } = new (0, 0, 0,4);
         public static ScpServer Server { get; private set; }
         public static ConfigManager ConfigManager { get; private set; }
         public static CommandHandler CommandHandler { get; private set; }
+        public static ArgumentsManager.Args Args  { get; private set; }
 
         private static bool _exceptionalExit = true;
         
@@ -33,11 +35,11 @@ namespace SecretAdmin
 
         private static void Start(string[] args)
         {
-            var arguments = ArgumentsManager.GetArgs(args);
+            Args = ArgumentsManager.GetArgs(args);
             
             Paths.Load();
             ConfigManager = new ConfigManager();
-            if (ProgramIntroduction.FirstTime || arguments.Reconfigure)
+            if (ProgramIntroduction.FirstTime || Args.Reconfigure)
                 ProgramIntroduction.ShowIntroduction();
             ConfigManager.LoadConfig();
 
@@ -49,9 +51,9 @@ namespace SecretAdmin
             Utils.ArchiveControlLogs();
 
             CommandHandler = new CommandHandler();
-            ModuleManager.LoadAll(ConfigManager.GetServerConfig(arguments.Config).Port);
+            ModuleManager.LoadAll(ConfigManager.GetServerConfig(Args.Config).Port);
             
-            Server = new ScpServer(ConfigManager.GetServerConfig(arguments.Config));
+            Server = new ScpServer(ConfigManager.GetServerConfig(Args.Config));
             Server.Start();
             
             InputManager.Start();
